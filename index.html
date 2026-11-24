@@ -71,7 +71,17 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .stats b{color:var(--ink);font-variant-numeric:tabular-nums}
 #bd.over{opacity:.55}
 .tip{margin:0;font-size:13px;color:var(--muted);line-height:1.6}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.c.pop{animation:pop .35s ease-out}
+.c.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.fx.bad{background:#D6336C}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+.fx{position:fixed;z-index:50;pointer-events:none;color:#fff;font-weight:700;padding:4px 12px;border-radius:999px;font-size:16px;white-space:nowrap;animation:fly 1s ease-out forwards}
+.fx.l1{background:#2F5BEA}
+.fx.l2{background:#0E9F6E;font-size:18px}
+.fx.l3{background:#E8590C;font-size:20px}
+@keyframes fly{0%{opacity:0;transform:translate(-50%,0) scale(.7)}15%{opacity:1;transform:translate(-50%,-14px) scale(1.1)}100%{opacity:0;transform:translate(-50%,-52px) scale(1)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.c.pop,.c.shake{animation:none}.fx{animation:fade 1s forwards;transform:translate(-50%,-14px)}@keyframes fade{0%,60%{opacity:1}100%{opacity:0}}}
 </style>
 </head>
 <body>
@@ -139,7 +149,7 @@ function newGame(){
       if(solve(p.slice(),2)===1)left--;else p[i]=v;
     }
     giv=p.map(v=>v>0);cur=p.slice();nt=Array(81).fill(0);
-    hist=[];sel=-1;hints=0;miss=0;done=false;over=false;sec=0;
+    hist=[];sel=-1;hints=0;miss=0;streak=0;done=false;over=false;sec=0;
     clearInterval(tm);tm=setInterval(()=>{if(!done&&!over){sec++;$('#tm').textContent=fmt(sec)}},1000);
     $('#tm').textContent='00:00';$('#st').textContent='';render();
   },20);
@@ -169,13 +179,35 @@ function render(){
 const snap=()=>{hist.push([cur.slice(),nt.slice()]);if(hist.length>200)hist.shift()};
 function put(v){
   if(sel<0||giv[sel]||done||over)return;
+  let good=false,bad=false;
   if(pen){if(cur[sel])return;snap();nt[sel]^=1<<v}
   else{
     snap();
     if(cur[sel]===v)cur[sel]=0;
-    else{cur[sel]=v;nt[sel]=0;for(const j of P[sel])nt[j]&=~(1<<v);if(v!==sol[sel])miss++}
+    else{cur[sel]=v;nt[sel]=0;for(const j of P[sel])nt[j]&=~(1<<v);if(v!==sol[sel]){miss++;streak=0;bad=true}else good=true}
   }
   render();check();
+  if(good)cheer();
+  if(bad)oops();
+}
+let streak=0;
+function cheer(){
+  streak++;
+  const lv=streak>=5?3:streak>=3?2:1,txt=['','Good!','Great!','Excellent!'][lv];
+  const cell=document.querySelector('.c[data-i="'+sel+'"]');if(!cell)return;
+  cell.classList.add('pop');
+  const r=cell.getBoundingClientRect(),f=document.createElement('div');
+  f.className='fx l'+lv;f.textContent=txt+(streak>=3?' ×'+streak:'');
+  f.style.left=(r.left+r.width/2)+'px';f.style.top=r.top+'px';
+  document.body.appendChild(f);setTimeout(()=>f.remove(),1000);
+}
+function oops(){
+  const cell=document.querySelector('.c[data-i="'+sel+'"]');if(!cell)return;
+  cell.classList.add('shake');
+  const left=MAXM-miss,r=cell.getBoundingClientRect(),f=document.createElement('div');
+  f.className='fx bad';f.textContent=left>0?'Oops! 남은 기회 '+left:'Game Over';
+  f.style.left=(r.left+r.width/2)+'px';f.style.top=r.top+'px';
+  document.body.appendChild(f);setTimeout(()=>f.remove(),1000);
 }
 function erase(){if(sel<0||giv[sel]||done||over)return;snap();cur[sel]=0;nt[sel]=0;render()}
 function undo(){if(done||over||!hist.length)return;[cur,nt]=hist.pop();render()}
