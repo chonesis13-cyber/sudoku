@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>스도쿠(by JS)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#E9EEF3;--surface:#fff;--ink:#1A2433;--muted:#64748B;--line:#C9D3DF;--box:#1A2433;
+  --accent:#2F5BEA;--accent-soft:#DCE5FF;--peer:#EEF2F8;--same:#C5D4FF;--bad:#D6336C;--bad-soft:#FFE0EA;--on-accent:#fff;
+  color-scheme:light;
+  font-family:'Noto Sans KR',system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#11151C;--surface:#1A2029;--ink:#E8EDF5;--muted:#8D9BB0;--line:#2E3846;--box:#8FA3C2;
+    --accent:#7C9BFF;--accent-soft:#26335C;--peer:#212A36;--same:#2E3F73;--bad:#FF6B9A;--bad-soft:#4A2233;--on-accent:#11151C;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11151C;--surface:#1A2029;--ink:#E8EDF5;--muted:#8D9BB0;--line:#2E3846;--box:#8FA3C2;
+  --accent:#7C9BFF;--accent-soft:#26335C;--peer:#212A36;--same:#2E3F73;--bad:#FF6B9A;--bad-soft:#4A2233;--on-accent:#11151C;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:inherit;-webkit-tap-highlight-color:transparent}
+main{max-width:900px;margin:0 auto;padding:20px 16px 32px;display:grid;gap:20px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:780px){main{grid-template-columns:minmax(0,540px) 1fr;align-items:start;gap:28px}}
+header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline}
+h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em}
+#tm{font-variant-numeric:tabular-nums;font-size:20px;font-weight:600;color:var(--muted)}
+#bd{display:grid;grid-template-columns:repeat(9,1fr);grid-template-rows:repeat(9,1fr);aspect-ratio:1;width:100%;
+  border:2px solid var(--box);border-radius:6px;overflow:hidden;background:var(--surface)}
+#bd:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.c{border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface);
+  color:var(--accent);font:600 clamp(18px,5.6vw,30px)/1 inherit;font-family:inherit;padding:0;cursor:pointer;
+  display:grid;place-items:center;min-width:0;min-height:0}
+.c.g{color:var(--ink);font-weight:700}
+.c.r{border-right:2px solid var(--box)}
+.c.b{border-bottom:2px solid var(--box)}
+.c.p{background:var(--peer)}
+.c.m{background:var(--same)}
+.c.s{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
+.c.x{color:var(--bad);background:var(--bad-soft)}
+.n{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:100%;height:100%;
+  font-size:clamp(7px,1.9vw,11px);font-weight:400;color:var(--muted)}
+.n i{font-style:normal;display:grid;place-items:center}
+.side{display:grid;gap:14px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+button.t{font:inherit;font-family:inherit;color:var(--ink);background:transparent;border:0;cursor:pointer;padding:10px 8px;min-height:44px}
+.seg button{flex:1;font-weight:600;font-size:15px;padding:10px 2px;white-space:nowrap}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tools button{border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:14px}
+.tools button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.pad{display:grid;grid-template-columns:repeat(9,1fr);gap:6px}
+@media (min-width:780px){.pad{grid-template-columns:repeat(3,1fr);gap:8px}}
+.pad button{font:600 22px/1 inherit;font-family:inherit;color:var(--accent);background:var(--surface);border:1px solid var(--line);
+  border-radius:10px;padding:10px 0 6px;cursor:pointer;display:grid;gap:3px;place-items:center;min-height:52px}
+.pad small{font-size:10px;font-weight:400;color:var(--muted)}
+.pad button.off{opacity:.35}
+button.t.go{background:var(--accent);color:var(--on-accent);border-radius:10px;font-weight:700;font-size:16px;min-height:48px}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#st{min-height:1.6em;margin:0;font-weight:600}
+.stats{margin:0;display:flex;gap:18px;font-size:15px;color:var(--muted)}
+.stats b{color:var(--ink);font-variant-numeric:tabular-nums}
+#bd.over{opacity:.55}
+.tip{margin:0;font-size:13px;color:var(--muted);line-height:1.6}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <header><h1>스도쿠(by JS)</h1><span id="tm" aria-label="경과 시간">00:00</span></header>
+  <div id="bd" role="grid" aria-label="스도쿠 판" tabindex="0"></div>
+  <div class="side">
+    <div class="seg" id="df" role="group" aria-label="난이도">
+      <button class="t" data-k="easy" aria-pressed="true">쉬움</button>
+      <button class="t" data-k="mid" aria-pressed="false">보통</button>
+      <button class="t" data-k="hard" aria-pressed="false">어려움</button>
+      <button class="t" data-k="xhard" aria-pressed="false">매우 어려움</button>
+    </div>
+    <p class="stats"><span>실수 <b id="ms">0/3</b></span><span>힌트 남은 횟수 <b id="hs">3</b></span></p>
+    <div class="pad" id="pd" aria-label="숫자 입력"></div>
+    <div class="tools">
+      <button class="t" id="pn" aria-pressed="false">메모</button>
+      <button class="t" id="er">지우기</button>
+      <button class="t" id="un">되돌리기</button>
+      <button class="t" id="hi">힌트</button>
+    </div>
+    <button class="t go" id="ng">새 게임</button>
+    <p id="st" aria-live="polite"></p>
+    <p class="tip">칸을 선택한 뒤 숫자를 누르세요. 키보드에서는 숫자 키로 입력하고, 화살표로 이동하며, N은 메모, Z는 되돌리기입니다.</p>
+  </div>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const DIF={easy:40,mid:33,hard:27,xhard:22};
+const MAXM=3,MAXH=3;
+let dif='easy',sol,giv,cur,nt,sel=-1,pen=false,hist=[],sec=0,tm,done=false,over=false,hints=0,miss=0;
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const P=[...Array(81).keys()].map(i=>{const r=i/9|0,c=i%9,s=new Set(),br=r-r%3,bc=c-c%3;
+  for(let k=0;k<9;k++){s.add(r*9+k);s.add(k*9+c)}
+  for(let a=0;a<3;a++)for(let b=0;b<3;b++)s.add((br+a)*9+bc+b);
+  s.delete(i);return s});
+function cands(g,i){let m=1;for(const j of P[i])m|=1<<g[j];return ~m&0x3FE}
+function solve(g,lim,rand){
+  let n=0;
+  (function go(){
+    let best=-1,bm=0,bc=10;
+    for(let i=0;i<81;i++)if(!g[i]){
+      const m=cands(g,i);let c=0,x=m;while(x){c++;x&=x-1}
+      if(c<bc){bc=c;best=i;bm=m;if(c<=1)break}
+    }
+    if(best<0){n++;return true}
+    if(bc===0)return false;
+    const ds=[];for(let d=1;d<=9;d++)if(bm>>d&1)ds.push(d);
+    if(rand)shuffle(ds);
+    for(const d of ds){g[best]=d;if(go()&&n>=lim)return true}
+    g[best]=0;return false;
+  })();
+  return n;
+}
+const fmt=s=>String(s/60|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function newGame(){
+  $('#st').textContent='퍼즐을 만드는 중…';
+  setTimeout(()=>{
+    const f=Array(81).fill(0);solve(f,1,true);sol=f.slice();
+    const p=f.slice();let left=81;
+    for(const i of shuffle([...Array(81).keys()])){
+      if(left<=DIF[dif])break;
+      const v=p[i];p[i]=0;
+      if(solve(p.slice(),2)===1)left--;else p[i]=v;
+    }
+    giv=p.map(v=>v>0);cur=p.slice();nt=Array(81).fill(0);
+    hist=[];sel=-1;hints=0;miss=0;done=false;over=false;sec=0;
+    clearInterval(tm);tm=setInterval(()=>{if(!done&&!over){sec++;$('#tm').textContent=fmt(sec)}},1000);
+    $('#tm').textContent='00:00';$('#st').textContent='';render();
+  },20);
+}
+function render(){
+  const sv=sel>=0?cur[sel]:0;let h='';
+  for(let i=0;i<81;i++){
+    const v=cur[i],r=i/9|0,c=i%9;
+    let k='c';
+    if(giv[i])k+=' g';
+    if(c%3===2&&c<8)k+=' r';
+    if(r%3===2&&r<8)k+=' b';
+    if(i===sel)k+=' s';else if(sel>=0&&P[sel].has(i))k+=' p';
+    if(sv&&v===sv&&i!==sel)k+=' m';
+    if(v&&!giv[i]&&v!==sol[i])k+=' x';
+    let t=v||'';
+    if(!v&&nt[i]){t='<span class="n">';for(let d=1;d<=9;d++)t+='<i>'+(nt[i]>>d&1?d:'')+'</i>';t+='</span>'}
+    h+=`<button class="${k}" data-i="${i}" role="gridcell" tabindex="-1" aria-label="${r+1}행 ${c+1}열 ${v||'빈 칸'}">${t}</button>`;
+  }
+  $('#bd').innerHTML=h;$('#bd').classList.toggle('over',over);
+  let p='';
+  for(let d=1;d<=9;d++){const rem=9-cur.filter(v=>v===d).length;
+    p+=`<button data-d="${d}" class="${rem<=0?'off':''}" aria-label="${d} 입력">${d}<small>${rem}</small></button>`}
+  $('#pd').innerHTML=p;
+  $('#ms').textContent=miss+'/'+MAXM;$('#hs').textContent=MAXH-hints;$('#hi').textContent='힌트 '+(MAXH-hints);
+}
+const snap=()=>{hist.push([cur.slice(),nt.slice()]);if(hist.length>200)hist.shift()};
+function put(v){
+  if(sel<0||giv[sel]||done||over)return;
+  if(pen){if(cur[sel])return;snap();nt[sel]^=1<<v}
+  else{
+    snap();
+    if(cur[sel]===v)cur[sel]=0;
+    else{cur[sel]=v;nt[sel]=0;for(const j of P[sel])nt[j]&=~(1<<v);if(v!==sol[sel])miss++}
+  }
+  render();check();
+}
+function erase(){if(sel<0||giv[sel]||done||over)return;snap();cur[sel]=0;nt[sel]=0;render()}
+function undo(){if(done||over||!hist.length)return;[cur,nt]=hist.pop();render()}
+function hint(){
+  if(done||over)return;
+  if(hints>=MAXH){$('#st').textContent='힌트를 모두 사용했어요.';return}
+  if(sel<0||giv[sel]||cur[sel]===sol[sel]){$('#st').textContent='힌트를 받을 빈 칸이나 틀린 칸을 먼저 선택하세요.';return}
+  snap();cur[sel]=sol[sel];nt[sel]=0;hints++;render();check();
+}
+function check(){
+  if(miss>=MAXM){
+    over=true;clearInterval(tm);render();
+    $('#st').textContent='게임 오버! 실수가 3번 쌓였어요. 새 게임으로 다시 도전해 보세요.';return;
+  }
+  if(cur.every((v,i)=>v===sol[i])){
+    done=true;clearInterval(tm);
+    $('#st').textContent=`완성했어요! 걸린 시간 ${fmt(sec)}, 실수 ${miss}회, 힌트 ${hints}회`;
+  }else $('#st').textContent='';
+}
+$('#bd').addEventListener('click',e=>{const b=e.target.closest('.c');if(b){sel=+b.dataset.i;render()}});
+$('#pd').addEventListener('click',e=>{const b=e.target.closest('button');if(b)put(+b.dataset.d)});
+$('#df').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  dif=b.dataset.k;
+  document.querySelectorAll('#df button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  newGame();
+});
+$('#pn').onclick=()=>{pen=!pen;$('#pn').setAttribute('aria-pressed',pen)};
+$('#er').onclick=erase;$('#un').onclick=undo;$('#hi').onclick=hint;$('#ng').onclick=newGame;
+document.addEventListener('keydown',e=>{
+  if(e.target.closest&&e.target.closest('#df,.tools,#ng,#pd')&&(e.key==='Enter'||e.key===' '))return;
+  const k=e.key;
+  if(/^[1-9]$/.test(k)){put(+k);return}
+  if(k==='0'||k==='Backspace'||k==='Delete'){erase();return}
+  if(k==='n'||k==='N'){$('#pn').click();return}
+  if(k==='z'||k==='Z'){undo();return}
+  const mv={ArrowUp:-9,ArrowDown:9,ArrowLeft:-1,ArrowRight:1}[k];
+  if(mv){
+    e.preventDefault();
+    if(sel<0)sel=40;
+    else{const r=sel/9|0,c=sel%9,nr=r+(mv===-9?-1:mv===9?1:0),nc=c+(mv===-1?-1:mv===1?1:0);
+      if(nr>=0&&nr<9&&nc>=0&&nc<9)sel=nr*9+nc}
+    render();
+  }
+});
+newGame();
+</script>
+</body>
+</html>
