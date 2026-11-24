@@ -31,13 +31,13 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:inherit;-webkit-
 main{max-width:900px;margin:0 auto;padding:20px 16px 32px;display:grid;gap:20px;grid-template-columns:minmax(0,1fr)}
 @media (min-width:780px){main{grid-template-columns:minmax(0,540px) 1fr;align-items:start;gap:28px}}
 header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline}
-h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em}
-#tm{font-variant-numeric:tabular-nums;font-size:20px;font-weight:600;color:var(--muted)}
+h1{margin:0;font-size:32px;font-weight:700;letter-spacing:-.02em}
+#tm{font-variant-numeric:tabular-nums;font-size:28px;font-weight:700;color:var(--ink)}
 #bd{display:grid;grid-template-columns:repeat(9,1fr);grid-template-rows:repeat(9,1fr);aspect-ratio:1;width:100%;
   border:2px solid var(--box);border-radius:6px;overflow:hidden;background:var(--surface)}
 #bd:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 .c{border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface);
-  color:var(--accent);font:600 clamp(18px,5.6vw,30px)/1 inherit;font-family:inherit;padding:0;cursor:pointer;
+  color:var(--accent);font-weight:600;font-size:clamp(24px,7vw,42px);line-height:1;font-family:inherit;padding:0;cursor:pointer;
   display:grid;place-items:center;min-width:0;min-height:0}
 .c.g{color:var(--ink);font-weight:700}
 .c.r{border-right:2px solid var(--box)}
@@ -47,39 +47,38 @@ h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em}
 .c.s{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
 .c.x{color:var(--bad);background:var(--bad-soft)}
 .n{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:100%;height:100%;
-  font-size:clamp(7px,1.9vw,11px);font-weight:400;color:var(--muted)}
+  font-size:clamp(9px,2.6vw,14px);font-weight:400;color:var(--muted)}
 .n i{font-style:normal;display:grid;place-items:center}
 .side{display:grid;gap:14px}
-.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 button.t{font:inherit;font-family:inherit;color:var(--ink);background:transparent;border:0;cursor:pointer;padding:10px 8px;min-height:44px}
-.seg button{flex:1;font-weight:600;font-size:15px;padding:10px 2px;white-space:nowrap}
-.seg button+button{border-left:1px solid var(--line)}
+.seg button{font-weight:600;font-size:19px;padding:12px 4px;min-height:54px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
-.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.tools button{border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:14px}
+.tools{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.tools button{border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:19px;min-height:54px}
 .tools button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
 .pad{display:grid;grid-template-columns:repeat(9,1fr);gap:6px}
 @media (min-width:780px){.pad{grid-template-columns:repeat(3,1fr);gap:8px}}
-.pad button{font:600 22px/1 inherit;font-family:inherit;color:var(--accent);background:var(--surface);border:1px solid var(--line);
-  border-radius:10px;padding:10px 0 6px;cursor:pointer;display:grid;gap:3px;place-items:center;min-height:52px}
-.pad small{font-size:10px;font-weight:400;color:var(--muted)}
+.pad button{font-weight:600;font-size:30px;line-height:1;font-family:inherit;color:var(--accent);background:var(--surface);border:1px solid var(--line);
+  border-radius:10px;padding:10px 0 6px;cursor:pointer;display:grid;gap:3px;place-items:center;min-height:68px}
+.pad small{font-size:14px;font-weight:400;color:var(--muted)}
 .pad button.off{opacity:.35}
-button.t.go{background:var(--accent);color:var(--on-accent);border-radius:10px;font-weight:700;font-size:16px;min-height:48px}
+button.t.go{background:var(--accent);color:var(--on-accent);border-radius:10px;font-weight:700;font-size:22px;min-height:60px}
 button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-#st{min-height:1.6em;margin:0;font-weight:600}
-.stats{margin:0;display:flex;gap:18px;font-size:15px;color:var(--muted)}
+#st{min-height:1.6em;margin:0;font-weight:600;font-size:20px;line-height:1.5}
+.stats{margin:0;display:flex;flex-wrap:wrap;gap:6px 20px;font-size:19px;color:var(--ink)}
 .stats b{color:var(--ink);font-variant-numeric:tabular-nums}
 #bd.over{opacity:.55}
-.tip{margin:0;font-size:13px;color:var(--muted);line-height:1.6}
+.tip{margin:0;font-size:16px;color:var(--muted);line-height:1.6}
 .c.pop{animation:pop .35s ease-out}
 .c.shake{animation:shake .4s}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
 .fx.bad{background:#D6336C}
 @keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
-.fx{position:fixed;z-index:50;pointer-events:none;color:#fff;font-weight:700;padding:4px 12px;border-radius:999px;font-size:16px;white-space:nowrap;animation:fly 1s ease-out forwards}
+.fx{position:fixed;z-index:50;pointer-events:none;color:#fff;font-weight:700;padding:4px 12px;border-radius:999px;font-size:22px;white-space:nowrap;animation:fly 1s ease-out forwards}
 .fx.l1{background:#2F5BEA}
-.fx.l2{background:#0E9F6E;font-size:18px}
-.fx.l3{background:#E8590C;font-size:20px}
+.fx.l2{background:#0E9F6E;font-size:26px}
+.fx.l3{background:#E8590C;font-size:30px}
 @keyframes fly{0%{opacity:0;transform:translate(-50%,0) scale(.7)}15%{opacity:1;transform:translate(-50%,-14px) scale(1.1)}100%{opacity:0;transform:translate(-50%,-52px) scale(1)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}.c.pop,.c.shake{animation:none}.fx{animation:fade 1s forwards;transform:translate(-50%,-14px)}@keyframes fade{0%,60%{opacity:1}100%{opacity:0}}}
 </style>
