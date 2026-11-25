@@ -140,6 +140,23 @@ function logic(g0,hidden){
   }
   return g.every(v=>v);
 }
+function rest(g0){
+  const g=g0.slice();let ch=true;
+  while(ch){
+    ch=false;
+    for(let i=0;i<81;i++)if(!g[i]){
+      const m=cands(g,i);
+      if(!m)return 99;
+      if(!(m&(m-1))){g[i]=31-Math.clz32(m);ch=true}
+    }
+    for(const u of U)for(let d=1;d<=9;d++){
+      let cnt=0,at=-1;
+      for(const i of u){if(g[i]===d){cnt=-99;break}if(!g[i]&&(cands(g,i)>>d&1)){cnt++;at=i}}
+      if(cnt===1){g[at]=d;ch=true}
+    }
+  }
+  return g.filter(v=>!v).length;
+}
 const MAXM=3,MAXH=3;
 let dif='easy',sol,giv,cur,nt,sel=-1,pen=false,hist=[],sec=0,tm,done=false,over=false,hints=0,miss=0;
 const rnd=n=>Math.floor(Math.random()*n);
@@ -170,18 +187,24 @@ const fmt=s=>String(s/60|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 function newGame(){
   $('#sm').textContent='퍼즐을 만드는 중…';
   setTimeout(()=>{
-    const [target,need]=CFG[dif],t0=Date.now();let p,f;
-    for(let a=0;a<60;a++){
-      if(a%6===0){f=Array(81).fill(0);solve(f,1,true);sol=f.slice()}
-      p=f.slice();let left=81;
+    const [target,need]=CFG[dif],t0=Date.now();let f,best,bs=-1,bsol;
+    for(let a=0;a<80;a++){
+      if(a%6===0){f=Array(81).fill(0);solve(f,1,true)}
+      const q=f.slice();let left=81;
       for(const i of shuffle([...Array(81).keys()])){
         if(left<=target)break;
-        const v=p[i];p[i]=0;
-        if(solve(p.slice(),2)===1)left--;else p[i]=v;
+        const v=q[i];q[i]=0;
+        if(solve(q.slice(),2)===1)left--;else q[i]=v;
       }
-      if(need===0||!logic(p,need===2))break;
-      if(Date.now()-t0>3000)break;
+      if(need===0){best=q;bsol=f;break}
+      let ok,sc;
+      if(need===1){ok=!logic(q,false);sc=ok?1:0}
+      else{const r=rest(q);ok=r>=20;sc=r*100-q.filter(Boolean).length}
+      if(sc>bs){bs=sc;best=q;bsol=f}
+      if(ok&&dif!=='xhard')break;
+      if(Date.now()-t0>(dif==='xhard'?1500:2500))break;
     }
+    sol=bsol.slice();const p=best;
     giv=p.map(v=>v>0);cur=p.slice();nt=Array(81).fill(0);
     hist=[];sel=-1;hints=0;miss=0;streak=0;done=false;over=false;sec=0;
     clearInterval(tm);tm=setInterval(()=>{if(!done&&!over){sec++;$('#tm').textContent=fmt(sec)}},1000);
