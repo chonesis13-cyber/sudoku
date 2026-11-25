@@ -30,7 +30,9 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:inherit;-webkit-tap-highlight-color:transparent}
 main{max-width:900px;margin:0 auto;padding:20px 16px 32px;display:grid;gap:20px;grid-template-columns:minmax(0,1fr)}
 @media (min-width:780px){main{grid-template-columns:minmax(0,540px) 1fr;align-items:start;gap:28px}}
-header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline}
+header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center}
+.hr{display:flex;align-items:center;gap:12px}
+#sd{font-size:24px;line-height:1;min-width:48px;min-height:48px;padding:0;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
 h1{margin:0;font-size:32px;font-weight:600;letter-spacing:-.02em}
 #tm{font-variant-numeric:tabular-nums;font-size:28px;font-weight:600;color:var(--ink)}
 #bd{display:grid;grid-template-columns:repeat(9,1fr);grid-template-rows:repeat(9,1fr);aspect-ratio:1;width:100%;
@@ -101,7 +103,7 @@ button.t.ghost{border:1px solid var(--line);border-radius:10px;font-size:19px;mi
 </head>
 <body>
 <main>
-  <header><h1>스도쿠(by JS)</h1><span id="tm" aria-label="경과 시간">00:00</span></header>
+  <header><h1>스도쿠(by JS)</h1><span class="hr"><button class="t" id="sd" aria-pressed="true" aria-label="소리와 진동 켜짐">🔊</button><span id="tm" aria-label="경과 시간">00:00</span></span></header>
   <div id="bd" role="grid" aria-label="스도쿠 판" tabindex="0"></div>
   <div class="side">
     <div id="start" role="dialog" aria-modal="true" aria-labelledby="sh"><div class="sbox"><h2 id="sh">스도쿠(by JS)</h2><p class="sub">난이도를 선택해 주세요</p>
@@ -257,7 +259,25 @@ function put(v){
   if(bad)oops();
 }
 let streak=0;
+let AC=null,snd=true;
+function beep(kind){
+  if(!snd)return;
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==='suspended')AC.resume();
+    const n=AC.currentTime;
+    const seq=kind==='good'?[[784,0,.1,'sine',.25],[1175,.1,.18,'sine',.25]]:[[170,0,.2,'sawtooth',.16],[125,.18,.24,'sawtooth',.16]];
+    for(const [f,s,d,ty,v] of seq){
+      const o=AC.createOscillator(),g=AC.createGain();
+      o.type=ty;o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,n+s);g.gain.linearRampToValueAtTime(v,n+s+.01);g.gain.exponentialRampToValueAtTime(.001,n+s+d);
+      o.connect(g);g.connect(AC.destination);o.start(n+s);o.stop(n+s+d+.02);
+    }
+  }catch(e){}
+}
+function buzz(p){if(!snd)return;try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}}
 function cheer(){
+  beep('good');buzz(25);
   streak++;
   const lv=streak>=5?3:streak>=3?2:1,txt=['','Good!','Great!','Excellent!'][lv];
   const cell=document.querySelector('.c[data-i="'+sel+'"]');if(!cell)return;
@@ -268,6 +288,7 @@ function cheer(){
   document.body.appendChild(f);setTimeout(()=>f.remove(),1000);
 }
 function oops(){
+  beep('bad');buzz([70,40,70]);
   const cell=document.querySelector('.c[data-i="'+sel+'"]');if(!cell)return;
   cell.classList.add('shake');
   const left=MAXM-miss,r=cell.getBoundingClientRect(),f=document.createElement('div');
@@ -319,6 +340,11 @@ $('#er').onclick=erase;$('#un').onclick=undo;$('#hi').onclick=hint;$('#ng').oncl
 $('#cx').onclick=()=>{$('#start').hidden=true};
 $('#wn').onclick=()=>{$('#win').hidden=true;$('#cx').hidden=true;$('#start').hidden=false};
 $('#wc').onclick=()=>{$('#win').hidden=true};
+$('#sd').onclick=()=>{
+  snd=!snd;const b=$('#sd');
+  b.textContent=snd?'🔊':'🔇';b.setAttribute('aria-pressed',snd);b.setAttribute('aria-label',snd?'소리와 진동 켜짐':'소리와 진동 꺼짐');
+  if(snd){beep('good');buzz(25)}
+};
 document.addEventListener('keydown',e=>{
   if(!$('#start').hidden||!cur)return;
   if(e.target.closest&&e.target.closest('#df,.tools,#ng,#pd')&&(e.key==='Enter'||e.key===' '))return;
