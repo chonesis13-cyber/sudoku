@@ -128,7 +128,7 @@ button.t.ghost{border:1px solid var(--line);border-radius:10px;font-size:19px;mi
 <div id="win" role="dialog" aria-modal="true" aria-labelledby="wh" hidden><div class="wbox"><h2 id="wh">🎉 축하합니다!</h2><p id="wt"></p><button class="t go" id="wn">새 게임</button><button class="t ghost" id="wc">판 확인하기</button></div></div>
 <script>
 const $=s=>document.querySelector(s);
-const CFG={easy:[36,0],mid:[30,1],hard:[25,2],xhard:[17,2]};
+const CFG={easy:[38,0],mid:[32,1],hard:[27,1],xhard:[23,2]};
 const LBL={easy:'쉬움',mid:'보통',hard:'어려움',xhard:'매우 어려움'};
 let gen=false;
 const U=[];for(let k=0;k<9;k++){const r=[],c=[],b=[];for(let j=0;j<9;j++){r.push(k*9+j);c.push(j*9+k);b.push(((k/3|0)*3+(j/3|0))*9+(k%3)*3+j%3)}U.push(r,c,b)}
@@ -210,8 +210,8 @@ function newGame(){
       if(need===1){ok=!logic(q,false);sc=ok?1:0}
       else{const r=rest(q);ok=r>=20;sc=r*100-q.filter(Boolean).length}
       if(sc>bs){bs=sc;best=q;bsol=f}
-      if(ok&&dif!=='xhard')break;
-      if(Date.now()-t0>(dif==='xhard'?1500:2500))break;
+      if(ok)break;
+      if(Date.now()-t0>2500)break;
     }
     sol=bsol.slice();const p=best;
     giv=p.map(v=>v>0);cur=p.slice();nt=Array(81).fill(0);
